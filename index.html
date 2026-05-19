@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planeador de Clase GANAG</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g1: #C0392B; --g1-light: #FADBD8; --g1-mid: #E74C3C;
+  --a1: #E67E22; --a1-light: #FDEBD0; --a1-mid: #F39C12;
+  --n:  #27AE60; --n-light:  #D5F5E3; --n-mid:  #2ECC71;
+  --a2: #2980B9; --a2-light: #D6EAF8; --a2-mid: #3498DB;
+  --g2: #8E44AD; --g2-light: #E8DAEF; --g2-mid: #9B59B6;
+  --dark: #1a1a2e; --mid: #4a4a6a; --light: #f8f7f4;
+  --white: #ffffff; --border: #e8e4de;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 32px rgba(0,0,0,0.14);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--light);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--dark);
+  min-height: 100vh;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 4px; background: #e0ddd8;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--g1), var(--a1), var(--n), var(--a2), var(--g2));
+  width: 0%; transition: width 0.4s ease;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--dark);
+  padding: 40px 48px 36px;
+  position: relative; overflow: hidden;
+}
+.header::before {
+  content: 'GANAG';
+  position: absolute; right: -20px; top: -20px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 140px; color: rgba(255,255,255,0.03);
+  pointer-events: none; user-select: none;
+  line-height: 1;
+}
+.header-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+}
+.header-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 14px;
+}
+.header h1 {
+  font-family: 'DM Serif Display', serif;
+  color: white; font-size: 2.4rem; line-height: 1.15;
+  margin-bottom: 8px;
+}
+.header p { color: rgba(255,255,255,0.55); font-size: 14px; max-width: 520px; line-height: 1.6; }
+
+.ganag-pills {
+  display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap;
+}
+.pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 30px;
+  font-size: 12px; font-weight: 600; color: white;
+  cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+  border: none; letter-spacing: 0.3px;
+}
+.pill:hover { transform: translateY(-2px); opacity: 0.9; }
+.pill-g1 { background: var(--g1); }
+.pill-a1 { background: var(--a1); }
+.pill-n  { background: var(--n); }
+.pill-a2 { background: var(--a2); }
+.pill-g2 { background: var(--g2); }
+.pill-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+
+/* ── MAIN LAYOUT ── */
+.container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+/* ── SECTION CARDS ── */
+.section-card {
+  background: white; border-radius: 20px;
+  box-shadow: var(--shadow); margin-bottom: 28px;
+  overflow: hidden; transition: box-shadow 0.3s;
+  animation: slideUp 0.5s ease forwards; opacity: 0;
+}
+.section-card:hover { box-shadow: var(--shadow-hover); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.section-card:nth-child(1) { animation-delay: 0.05s; }
+.section-card:nth-child(2) { animation-delay: 0.1s; }
+.section-card:nth-child(3) { animation-delay: 0.15s; }
+.section-card:nth-child(4) { animation-delay: 0.2s; }
+.section-card:nth-child(5) { animation-delay: 0.25s; }
+.section-card:nth-child(6) { animation-delay: 0.3s; }
+.section-card:nth-child(7) { animation-delay: 0.35s; }
+.section-card:nth-child(8) { animation-delay: 0.4s; }
+
+.card-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 28px; cursor: pointer;
+  user-select: none;
+}
+.card-accent {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.card-title-group {}
+.card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 3px; }
+.card-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--dark); }
+.card-time { font-size: 12px; color: var(--mid); margin-top: 2px; }
+.card-toggle {
+  margin-left: auto; width: 28px; height: 28px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--light); color: var(--mid); font-size: 14px;
+  transition: transform 0.3s; flex-shrink: 0;
+}
+.card-toggle.open { transform: rotate(180deg); }
+
+.card-body { padding: 0 28px 28px; display: none; }
+.card-body.open { display: block; }
+
+.card-tip {
+  background: var(--light); border-radius: 10px;
+  padding: 12px 16px; margin-bottom: 20px;
+  font-size: 13px; color: var(--mid); line-height: 1.6;
+  border-left: 3px solid;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── FORM FIELDS ── */
+.field-group { margin-bottom: 18px; }
+.field-group label {
+  display: block; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--mid); margin-bottom: 6px;
+}
+.field-group input,
+.field-group textarea,
+.field-group select {
+  width: 100%; padding: 12px 16px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--dark);
+  background: white; transition: border-color 0.2s, box-shadow 0.2s;
+  resize: vertical; outline: none;
+}
+.field-group input:focus,
+.field-group textarea:focus,
+.field-group select:focus {
+  border-color: currentColor;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+.field-group textarea { min-height: 90px; line-height: 1.6; }
+.field-group input::placeholder,
+.field-group textarea::placeholder { color: #b0aaa0; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+.char-count { font-size: 11px; color: #b0aaa0; text-align: right; margin-top: 4px; }
+
+/* SMART builder */
+.smart-builder {
+  background: linear-gradient(135deg, #fafaf8, var(--light));
+  border-radius: 14px; padding: 20px; margin-bottom: 18px;
+  border: 1.5px solid var(--border);
+}
+.smart-builder-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--mid); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.smart-row {
+  display: grid; grid-template-columns: 36px 1fr;
+  gap: 12px; align-items: start; margin-bottom: 12px;
+}
+.smart-row:last-child { margin-bottom: 0; }
+.smart-letter {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif; font-size: 18px;
+  color: white; flex-shrink: 0; margin-top: 2px;
+}
+.sl { background: var(--g1); }
+.sm { background: var(--a1); }
+.sa { background: var(--n); }
+.sr { background: var(--a2); }
+.st { background: var(--g2); }
+
+.smart-field {}
+.smart-field label { font-size: 11px; color: var(--mid); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; display: block; }
+.smart-field input, .smart-field textarea {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--dark);
+  outline: none; transition: border-color 0.2s;
+  resize: none;
+}
+.smart-field input:focus, .smart-field textarea:focus { border-color: #888; }
+
+.objetivo-preview {
+  background: var(--dark); border-radius: 12px; padding: 18px 20px;
+  margin-top: 16px;
+}
+.objetivo-preview-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+.objetivo-preview-text {
+  font-size: 14px; color: white; line-height: 1.7; font-style: italic;
+  min-height: 44px; color: rgba(255,255,255,0.85);
+}
+.objetivo-highlight { color: white; font-style: normal; font-weight: 600; }
+
+/* GANAG phases */
+.ganag-phase {
+  border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  border: 1.5px solid var(--border);
+}
+.ganag-phase-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+}
+.phase-letter {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif; font-size: 17px; color: white;
+  flex-shrink: 0;
+}
+.phase-name { font-weight: 600; font-size: 14px; }
+.phase-sub  { font-size: 12px; color: var(--mid); }
+.phase-time-badge {
+  margin-left: auto; padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; color: white;
+}
+.ganag-phase-body { padding: 16px 18px; background: white; }
+
+/* Timer selector */
+.timer-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.timer-btn {
+  padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer;
+  background: white; color: var(--mid); font-weight: 600;
+  transition: all 0.15s;
+}
+.timer-btn:hover { border-color: #888; color: var(--dark); }
+.timer-btn.active { color: white; border-color: transparent; }
+
+/* Bloom selector */
+.bloom-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.bloom-btn {
+  padding: 5px 14px; border-radius: 8px; border: 1.5px solid var(--border);
+  font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer;
+  background: white; color: var(--mid); font-weight: 500;
+  transition: all 0.15s;
+}
+.bloom-btn:hover { border-color: #888; }
+.bloom-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
+
+/* Resources */
+.resource-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.resource-tag {
+  padding: 6px 14px; border-radius: 8px; border: 1.5px solid var(--border);
+  font-size: 12px; cursor: pointer; font-weight: 500;
+  transition: all 0.15s; background: white; color: var(--mid);
+  display: flex; align-items: center; gap: 6px;
+}
+.resource-tag.active { background: var(--dark); color: white; border-color: var(--dark); }
+
+/* Evaluation */
+.eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.eval-option {
+  padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border);
+  cursor: pointer; transition: all 0.2s; text-align: center;
+  font-size: 13px; font-weight: 500; color: var(--mid);
+}
+.eval-option:hover { border-color: #888; color: var(--dark); }
+.eval-option.active { border-color: var(--a2); background: var(--a2-light); color: var(--a2); }
+.eval-option .eval-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+
+/* Competences checkboxes */
+.comp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.comp-item {
+  padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+  cursor: pointer; transition: all 0.2s; text-align: center;
+  font-size: 12px; font-weight: 500; color: var(--mid);
+}
+.comp-item:hover { border-color: #888; }
+.comp-item.active { border-color: var(--n); background: var(--n-light); color: var(--n); }
+.comp-item .comp-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+
+/* SUMMARY */
+.summary-card {
+  background: var(--dark); border-radius: 20px; padding: 32px;
+  margin-top: 32px; color: white;
+  animation: slideUp 0.5s ease 0.45s forwards; opacity: 0;
+}
+.summary-title {
+  font-family: 'DM Serif Display', serif; font-size: 1.5rem;
+  color: white; margin-bottom: 6px;
+}
+.summary-subtitle { color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 28px; }
+
+.timeline {
+  display: flex; flex-direction: column; gap: 0;
+}
+.tl-item {
+  display: grid; grid-template-columns: 56px 20px 1fr;
+  gap: 0 16px; align-items: start;
+}
+.tl-time {
+  text-align: right; padding-top: 12px;
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4);
+  font-variant-numeric: tabular-nums;
+}
+.tl-line {
+  display: flex; flex-direction: column; align-items: center;
+}
+.tl-dot {
+  width: 20px; height: 20px; border-radius: 50%; margin-top: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.tl-connector { width: 2px; flex: 1; min-height: 24px; }
+.tl-content { padding: 8px 0 20px; }
+.tl-phase { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.tl-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; min-height: 16px; }
+
+/* Print & export */
+.actions {
+  display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: 10px; font-size: 14px;
+  font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; border: none; transition: all 0.2s;
+}
+.btn-primary { background: white; color: var(--dark); }
+.btn-primary:hover { background: #f0ede8; transform: translateY(-1px); }
+.btn-outline { background: transparent; color: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.2); }
+.btn-outline:hover { background: rgba(255,255,255,0.08); color: white; }
+
+/* completion bar */
+.completion-bar {
+  background: white; border-radius: 20px; padding: 20px 28px;
+  margin-bottom: 28px; display: flex; align-items: center; gap: 16px;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.4s ease 0.02s forwards; opacity: 0;
+}
+.comp-label { font-size: 13px; font-weight: 600; color: var(--dark); white-space: nowrap; }
+.comp-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.comp-fill { height: 100%; background: linear-gradient(90deg, var(--g1), var(--g2)); border-radius: 4px; transition: width 0.4s ease; width: 0%; }
+.comp-pct { font-size: 13px; font-weight: 700; color: var(--dark); white-space: nowrap; min-width: 36px; text-align: right; }
+
+@media print {
+  #browser-banner, .progress-bar, .ganag-pills, .actions,
+  .timer-selector, .bloom-selector, .resource-tags,
+  .eval-grid, .comp-grid, .card-toggle, .completion-bar { display: none !important; }
+  body { background: white !important; }
+  .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .section-card { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; margin-bottom: 16px; }
+  .card-body { display: block !important; }
+  .ganag-phase-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .summary-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; }
+  .container { padding: 0 16px !important; }
+}
+
+@media (max-width: 600px) {
+  .header { padding: 28px 20px; }
+  .container { padding: 24px 16px 60px; }
+  .field-row, .field-row-3, .eval-grid, .comp-grid { grid-template-columns: 1fr; }
+  .smart-row { grid-template-columns: 32px 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- AVISO: abrir en navegador -->
+<div id="browser-banner" style="background:#f39c12; color:white; text-align:center; padding:12px 20px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.3px; position:relative; z-index:200;">
+  ⚠️ Para que los botones <strong>Enviar</strong> e <strong>Imprimir</strong> funcionen, descarga este archivo y ábrelo en <strong>Chrome, Edge o Firefox</strong> — no en el visor de Claude.
+  <button onclick="document.getElementById('browser-banner').style.display='none'" style="margin-left:16px; background:rgba(0,0,0,0.2); border:none; color:white; border-radius:6px; padding:3px 10px; cursor:pointer; font-size:12px;">✕ Cerrar</button>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-badge">📋 Herramienta de planeación docente</div>
+      <h1>Planeador de Clase<br>con Enfoque GANAG</h1>
+      <p>Completa cada sección para construir tu planeación paso a paso. El resumen final se genera automáticamente.</p>
+    </div>
+  </div>
+  <div class="ganag-pills">
+    <button class="pill pill-g1" onclick="scrollToSection('sec-g1')"><span class="pill-dot"></span>G · Goal / Meta</button>
+    <button class="pill pill-a1" onclick="scrollToSection('sec-a1')"><span class="pill-dot"></span>A · Access Prior Knowledge</button>
+    <button class="pill pill-n"  onclick="scrollToSection('sec-n')"><span class="pill-dot"></span>N · New Information</button>
+    <button class="pill pill-a2" onclick="scrollToSection('sec-a2')"><span class="pill-dot"></span>A · Application of New Information</button>
+    <button class="pill pill-g2" onclick="scrollToSection('sec-g2')"><span class="pill-dot"></span>G · Generalize</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- COMPLETION BAR -->
+<div class="completion-bar">
+  <span class="comp-label">Progreso de planeación</span>
+  <div class="comp-track"><div class="comp-fill" id="compFill"></div></div>
+  <span class="comp-pct" id="compPct">0%</span>
+</div>
+
+<!-- ── 0. DATOS GENERALES ── -->
+<div class="section-card">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:#f0ede8; font-size:24px;">📄</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--mid)">Paso 0</div>
+      <div class="card-title">Datos generales de la clase</div>
+      <div class="card-time">Información de identificación</div>
+    </div>
+    <div class="card-toggle open">▼</div>
+  </div>
+  <div class="card-body open">
+    <div class="field-row">
+      <div class="field-group">
+        <label>Institución Educativa</label>
+        <input type="text" placeholder="Nombre del colegio o IE" oninput="updateProgress()">
+      </div>
+      <div class="field-group">
+        <label>Docente</label>
+        <input type="text" placeholder="Tu nombre completo" oninput="updateProgress()">
+      </div>
+    </div>
+    <div class="field-row-3">
+      <div class="field-group">
+        <label>Área / Asignatura</label>
+        <input type="text" id="area" placeholder="Ej: Ciencias Naturales" oninput="updateProgress(); updatePreview()">
+      </div>
+      <div class="field-group">
+        <label>Grado</label>
+        <select oninput="updateProgress()">
+          <option value="">Selecciona</option>
+          <option>Grado 6°</option><option>Grado 7°</option><option>Grado 8°</option>
+          <option>Grado 9°</option><option>Grado 10°</option><option>Grado 11°</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Fecha</label>
+        <input type="date" oninput="updateProgress()">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>DBA o EBC asociado</label>
+        <input type="text" placeholder="Copia el DBA o estándar del MEN aquí" oninput="updateProgress()">
+      </div>
+      <div class="field-group">
+        <label>Duración total de la clase</label>
+        <select oninput="updateProgress()">
+          <option>55 minutos</option>
+          <option>60 minutos</option>
+          <option>90 minutos (doble hora)</option>
+          <option>45 minutos</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Tema o contenido de la clase</label>
+      <input type="text" id="tema" placeholder="Ej: La fotosíntesis — reactivos y productos" oninput="updateProgress(); updatePreview()">
+    </div>
+  </div>
+</div>
+
+<!-- ── 1. OBJETIVO SMART ── -->
+<div class="section-card">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:#fff0ed;">🎯</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--g1)">Paso 1</div>
+      <div class="card-title">Objetivo SMART de la clase</div>
+      <div class="card-time">Define qué aprenderán tus estudiantes hoy</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:var(--g1)">
+      <span class="tip-icon">💡</span>
+      <span>Completa cada componente SMART por separado. El objetivo completo se construirá automáticamente abajo. Usa verbos de la Taxonomía de Bloom: <strong>recordar, comprender, aplicar, analizar, evaluar, crear.</strong></span>
+    </div>
+    <div class="smart-builder">
+      <div class="smart-builder-title">🔨 Constructor de objetivo SMART</div>
+
+      <div class="smart-row">
+        <div class="smart-letter sl">S</div>
+        <div class="smart-field">
+          <label>Específico — Verbo + Contenido</label>
+          <input type="text" id="s-field" placeholder="Ej: explicar el proceso de la fotosíntesis identificando reactivos y productos" oninput="updatePreview()">
+        </div>
+      </div>
+      <div class="smart-row">
+        <div class="smart-letter sm">M</div>
+        <div class="smart-field">
+          <label>Medible — Instrumento y criterio</label>
+          <input type="text" id="m-field" placeholder="Ej: mediante un esquema comparativo con al menos 4 elementos correctos" oninput="updatePreview()">
+        </div>
+      </div>
+      <div class="smart-row">
+        <div class="smart-letter sa">A</div>
+        <div class="smart-field">
+          <label>Alcanzable — Justificación del nivel</label>
+          <input type="text" id="a-field" placeholder="Ej: apropiado para el grado 10° con base en conocimientos previos de biología" oninput="updatePreview()">
+        </div>
+      </div>
+      <div class="smart-row">
+        <div class="smart-letter sr">R</div>
+        <div class="smart-field">
+          <label>Relevante — DBA o EBC que conecta</label>
+          <input type="text" id="r-field" placeholder="Ej: en coherencia con el DBA de Ciencias Naturales grado 10° (MEN)" oninput="updatePreview()">
+        </div>
+      </div>
+      <div class="smart-row">
+        <div class="smart-letter st">T</div>
+        <div class="smart-field">
+          <label>Con tiempo — Cuándo se logrará</label>
+          <input type="text" id="t-field" placeholder="Ej: al finalizar la clase de 55 minutos" oninput="updatePreview()">
+        </div>
+      </div>
+
+      <div class="objetivo-preview">
+        <div class="objetivo-preview-label">✦ Tu objetivo SMART</div>
+        <div class="objetivo-preview-text" id="objetivo-preview">
+          Completa los campos para ver tu objetivo aquí...
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Competencias que desarrolla esta clase</label>
+      <div class="comp-grid" id="comp-grid">
+        <div class="comp-item" onclick="toggleComp(this)"><span class="comp-icon">🚀</span>Emprendedora</div>
+        <div class="comp-item" onclick="toggleComp(this)"><span class="comp-icon">💚</span>Socioemocional</div>
+        <div class="comp-item" onclick="toggleComp(this)"><span class="comp-icon">💻</span>Digital</div>
+        <div class="comp-item" onclick="toggleComp(this)"><span class="comp-icon">🔬</span>Científica</div>
+        <div class="comp-item" onclick="toggleComp(this)"><span class="comp-icon">🗣️</span>Comunicativa</div>
+        <div class="comp-item" onclick="toggleComp(this)"><span class="comp-icon">🤝</span>Ciudadana</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── G1 GOAL / META ── -->
+<div class="section-card" id="sec-g1">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:var(--g1-light); color:var(--g1); font-size:22px;">🎯</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--g1)">G · Goal / Meta — Fase 1</div>
+      <div class="card-title">Presentación del Objetivo</div>
+      <div class="card-time">⏱ Sugerido: 2 a 8 minutos</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:var(--g1)">
+      <span class="tip-icon">🎯</span>
+      <span><strong>¿Qué haces aquí?</strong> Comunica el objetivo de la clase de forma explícita y directa. El estudiante debe saber QUÉ aprenderá y POR QUÉ le importa antes de comenzar. Escribe el objetivo tal como se lo presentarás al grupo.</span>
+    </div>
+    <div class="ganag-phase" style="border-color:var(--g1-light)">
+      <div class="ganag-phase-header" style="background:var(--g1-light)">
+        <div class="phase-letter" style="background:var(--g1)">G</div>
+        <div><div class="phase-name" style="color:var(--g1)">Goal / Meta</div><div class="phase-sub">Presentación del objetivo</div></div>
+        <div class="phase-time-badge" style="background:var(--g1)">
+          <span id="g1-time-display">2 min</span>
+        </div>
+      </div>
+      <div class="ganag-phase-body">
+        <div class="field-group">
+          <label>Tiempo asignado</label>
+          <div class="timer-selector" id="timer-g1">
+            <button class="timer-btn active" onclick="setTimer('g1','2 min',this)">2 min</button>
+            <button class="timer-btn" onclick="setTimer('g1','5 min',this)">5 min</button>
+            <button class="timer-btn" onclick="setTimer('g1','8 min',this)">8 min</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Objetivo de la clase</label>
+          <textarea id="g1-gancho" placeholder="Escribe aquí el objetivo SMART completo tal como se lo presentarás a los estudiantes. Ej: Al finalizar la clase serán capaces de explicar el proceso de la fotosíntesis identificando sus reactivos y productos, mediante un esquema comparativo con al menos 4 elementos correctos." oninput="updateProgress(); updateTimeline()" style="min-height:110px;"></textarea>
+        </div>
+        <div class="field-group">
+          <label>¿Cómo presentarás el objetivo a los estudiantes?</label>
+          <textarea placeholder="Ej: Escribiré el objetivo en el tablero, lo leeré en voz alta y pediré a un estudiante que lo explique con sus palabras." oninput="updateProgress()"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Recursos necesarios</label>
+          <div class="resource-tags" id="res-g1">
+            <div class="resource-tag" onclick="toggleTag(this)">📽️ Proyector</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🖊️ Tablero</div>
+            <div class="resource-tag" onclick="toggleTag(this)">📱 Video</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🖼️ Imagen</div>
+            <div class="resource-tag" onclick="toggleTag(this)">❓ Pregunta oral</div>
+            <div class="resource-tag" onclick="toggleTag(this)">📰 Noticia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── A1 ACTIVAR ── -->
+<div class="section-card" id="sec-a1">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:var(--a1-light); color:var(--a1); font-size:22px;">🧠</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--a1)">A · Access Prior Knowledge / Activar conocimientos previos — Fase 2</div>
+      <div class="card-title">Activar conocimientos previos</div>
+      <div class="card-time">⏱ Sugerido: 5 a 10 minutos</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:var(--a1)">
+      <span class="tip-icon">🔑</span>
+      <span><strong>¿Qué haces aquí?</strong> Conecta el nuevo aprendizaje con lo que el estudiante ya sabe. Esto reduce la carga cognitiva y hace el aprendizaje más significativo. Usa preguntas, mapas mentales o lluvia de ideas.</span>
+    </div>
+    <div class="ganag-phase" style="border-color:var(--a1-light)">
+      <div class="ganag-phase-header" style="background:var(--a1-light)">
+        <div class="phase-letter" style="background:var(--a1)">A</div>
+        <div><div class="phase-name" style="color:var(--a1)">Access Prior Knowledge / Activar</div><div class="phase-sub">Saberes previos</div></div>
+        <div class="phase-time-badge" style="background:var(--a1)"><span id="a1-time-display">5 min</span></div>
+      </div>
+      <div class="ganag-phase-body">
+        <div class="field-group">
+          <label>Tiempo asignado</label>
+          <div class="timer-selector">
+            <button class="timer-btn active" onclick="setTimer('a1','5 min',this)">5 min</button>
+            <button class="timer-btn" onclick="setTimer('a1','8 min',this)">8 min</button>
+            <button class="timer-btn" onclick="setTimer('a1','10 min',this)">10 min</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>¿Qué saben los estudiantes sobre este tema?</label>
+          <textarea id="a1-previos" placeholder="Describe qué conocimientos previos esperas encontrar y cuáles son los posibles vacíos o preconcepciones erróneas..." oninput="updateProgress(); updateTimeline()"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Estrategia para activar los saberes previos</label>
+          <div class="resource-tags">
+            <div class="resource-tag" onclick="toggleTag(this)">💬 Lluvia de ideas</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🗺️ Mapa mental</div>
+            <div class="resource-tag" onclick="toggleTag(this)">❓ Preguntas orales</div>
+            <div class="resource-tag" onclick="toggleTag(this)">📝 Ficha rápida</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🎯 Quiz de entrada</div>
+            <div class="resource-tag" onclick="toggleTag(this)">👥 Conversación en parejas</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Pregunta(s) detonante(s) que usarás</label>
+          <textarea placeholder="Ej: ¿Qué necesita una planta para vivir? ¿Qué proceso le permite fabricar su propio alimento?" oninput="updateProgress()"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── N NUEVA INFORMACIÓN ── -->
+<div class="section-card" id="sec-n">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:var(--n-light); color:var(--n); font-size:22px;">📚</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--n)">N · New Information / Nueva información — Fase 3</div>
+      <div class="card-title">Nueva información</div>
+      <div class="card-time">⏱ Sugerido: 10 a 20 minutos</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:var(--n)">
+      <span class="tip-icon">📖</span>
+      <span><strong>¿Qué haces aquí?</strong> Presentas el nuevo saber de forma clara y estructurada. Es el <strong>cerebro de la clase</strong>: aquí se construye el conocimiento que el estudiante llevará a la acción. Usa pausas de procesamiento para que los estudiantes conecten la información.</span>
+    </div>
+    <div class="ganag-phase" style="border-color:var(--n-light)">
+      <div class="ganag-phase-header" style="background:var(--n-light)">
+        <div class="phase-letter" style="background:var(--n)">N</div>
+        <div><div class="phase-name" style="color:var(--n)">New Information / Nueva información</div><div class="phase-sub">🧠 El cerebro de la clase</div></div>
+        <div class="phase-time-badge" style="background:var(--n)"><span id="n-time-display">10 min</span></div>
+      </div>
+      <div class="ganag-phase-body">
+        <div class="field-group">
+          <label>Tiempo asignado</label>
+          <div class="timer-selector">
+            <button class="timer-btn active" onclick="setTimer('n','10 min',this)">10 min</button>
+            <button class="timer-btn" onclick="setTimer('n','15 min',this)">15 min</button>
+            <button class="timer-btn" onclick="setTimer('n','20 min',this)">20 min</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Nivel de Bloom de esta fase</label>
+          <div class="bloom-selector">
+            <button class="bloom-btn" onclick="toggleBloom(this)">Recordar</button>
+            <button class="bloom-btn active" onclick="toggleBloom(this)">Comprender</button>
+            <button class="bloom-btn" onclick="toggleBloom(this)">Aplicar</button>
+            <button class="bloom-btn" onclick="toggleBloom(this)">Analizar</button>
+            <button class="bloom-btn" onclick="toggleBloom(this)">Evaluar</button>
+            <button class="bloom-btn" onclick="toggleBloom(this)">Crear</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>¿Qué enseñarás y cómo lo presentarás?</label>
+          <textarea id="n-contenido" placeholder="Describe el contenido nuevo, la secuencia de explicación, ejemplos que usarás y cómo lo harás comprensible para los estudiantes..." oninput="updateProgress(); updateTimeline()" style="min-height:110px;"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Estrategia didáctica principal</label>
+          <div class="resource-tags">
+            <div class="resource-tag" onclick="toggleTag(this)">🎤 Clase expositiva</div>
+            <div class="resource-tag" onclick="toggleTag(this)">📖 Lectura guiada</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🎬 Video + discusión</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🔬 Experimento</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🗣️ Estudio de caso</div>
+            <div class="resource-tag" onclick="toggleTag(this)">💡 Demostración</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Pausa de procesamiento (¿cuándo y cómo?)</label>
+          <input type="text" placeholder="Ej: A los 10 min, los estudiantes escriben en su ficha una idea clave antes de continuar." oninput="updateProgress()">
+        </div>
+        <div class="field-group">
+          <label>Materiales y recursos</label>
+          <textarea placeholder="Ej: Presentación en PowerPoint (15 diapositivas), video de 4 min sobre la fotosíntesis, ficha de apuntes impresa." oninput="updateProgress()" style="min-height:70px;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── A2 APLICAR ── -->
+<div class="section-card" id="sec-a2">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:var(--a2-light); color:var(--a2); font-size:22px;">⚙️</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--a2)">A · Application of New Information / Aplicar el aprendizaje — Fase 4</div>
+      <div class="card-title">Aplicar el nuevo conocimiento</div>
+      <div class="card-time">⏱ Sugerido: 15 a 30 minutos</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:var(--a2)">
+      <span class="tip-icon">⚡</span>
+      <span><strong>¿Qué haces aquí?</strong> El estudiante practica con el nuevo conocimiento. Esta es la evidencia del objetivo SMART (la M) y <strong>el corazón de la clase GANAG</strong>: aquí ocurre el aprendizaje real. El docente circula, observa y retroalimenta en tiempo real.</span>
+    </div>
+    <div class="ganag-phase" style="border-color:var(--a2-light)">
+      <div class="ganag-phase-header" style="background:var(--a2-light)">
+        <div class="phase-letter" style="background:var(--a2)">A</div>
+        <div><div class="phase-name" style="color:var(--a2)">Application of New Information / Aplicar</div><div class="phase-sub">❤️ El corazón de la clase</div></div>
+        <div class="phase-time-badge" style="background:var(--a2)"><span id="a2-time-display">15 min</span></div>
+      </div>
+      <div class="ganag-phase-body">
+        <div class="field-group">
+          <label>Tiempo asignado</label>
+          <div class="timer-selector">
+            <button class="timer-btn active" onclick="setTimer('a2','15 min',this)">15 min</button>
+            <button class="timer-btn" onclick="setTimer('a2','20 min',this)">20 min</button>
+            <button class="timer-btn" onclick="setTimer('a2','30 min',this)">30 min</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Actividad de aplicación (descripción detallada)</label>
+          <textarea id="a2-actividad" placeholder="Describe exactamente qué harán los estudiantes: taller, ejercicio, debate, laboratorio, producto... Incluye las instrucciones que les darás." oninput="updateProgress(); updateTimeline()" style="min-height:110px;"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Modalidad de trabajo</label>
+          <div class="resource-tags">
+            <div class="resource-tag" onclick="toggleTag(this)">👤 Individual</div>
+            <div class="resource-tag" onclick="toggleTag(this)">👥 Parejas</div>
+            <div class="resource-tag" onclick="toggleTag(this)">👨‍👩‍👧 Grupos de 3</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🏢 Grupos de 4</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🌐 Plenaria</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Instrumento de evaluación formativa</label>
+          <div class="eval-grid">
+            <div class="eval-option" onclick="toggleEval(this)"><span class="eval-icon">📋</span>Lista de verificación</div>
+            <div class="eval-option active" onclick="toggleEval(this)"><span class="eval-icon">📊</span>Rúbrica</div>
+            <div class="eval-option" onclick="toggleEval(this)"><span class="eval-icon">🗣️</span>Observación directa</div>
+            <div class="eval-option" onclick="toggleEval(this)"><span class="eval-icon">✍️</span>Producto escrito</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Criterio mínimo de logro (el M del objetivo SMART)</label>
+          <input type="text" placeholder="Ej: El esquema debe incluir al menos 4 elementos con nombre, fórmula y función." oninput="updateProgress()">
+        </div>
+        <div class="field-group">
+          <label>¿Cómo retroalimentarás durante la actividad?</label>
+          <textarea placeholder="Ej: Circulo por los grupos, reviso los esquemas y hago preguntas guía. Si un grupo comete el mismo error, pauso y aclaro al grupo completo." oninput="updateProgress()" style="min-height:70px;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── G2 GENERALIZAR ── -->
+<div class="section-card" id="sec-g2">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:var(--g2-light); color:var(--g2); font-size:22px;">🌐</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:var(--g2)">G · Generalize / Generalizar — Fase 5</div>
+      <div class="card-title">Generalizar y conectar</div>
+      <div class="card-time">⏱ Sugerido: 5 a 8 minutos</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:var(--g2)">
+      <span class="tip-icon">🌱</span>
+      <span><strong>¿Qué haces aquí?</strong> El estudiante conecta lo aprendido con su vida, con otras áreas o con el futuro. Es el momento de la metacognición: ¿qué aprendí, cómo lo aprendí, para qué me sirve?</span>
+    </div>
+    <div class="ganag-phase" style="border-color:var(--g2-light)">
+      <div class="ganag-phase-header" style="background:var(--g2-light)">
+        <div class="phase-letter" style="background:var(--g2)">G</div>
+        <div><div class="phase-name" style="color:var(--g2)">Generalize / Generalizar</div><div class="phase-sub">Metacognición y transferencia</div></div>
+        <div class="phase-time-badge" style="background:var(--g2)"><span id="g2-time-display">5 min</span></div>
+      </div>
+      <div class="ganag-phase-body">
+        <div class="field-group">
+          <label>Tiempo asignado</label>
+          <div class="timer-selector">
+            <button class="timer-btn active" onclick="setTimer('g2','5 min',this)">5 min</button>
+            <button class="timer-btn" onclick="setTimer('g2','8 min',this)">8 min</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Pregunta de metacognición que usarás</label>
+          <textarea id="g2-meta" placeholder="Ej: ¿Qué aprendiste hoy que no sabías antes? ¿Dónde ves este proceso en tu vida cotidiana? ¿Qué preguntas nuevas te surgieron?" oninput="updateProgress(); updateTimeline()"></textarea>
+        </div>
+        <div class="field-group">
+          <label>¿Cómo conectarás el aprendizaje con el contexto del estudiante?</label>
+          <textarea placeholder="Ej: Preguntaré cómo la fotosíntesis conecta con los problemas de deforestación en Colombia y qué pueden hacer ellos al respecto." oninput="updateProgress()" style="min-height:70px;"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Cierre del objetivo: ¿cómo verificarás que se logró?</label>
+          <div class="resource-tags">
+            <div class="resource-tag" onclick="toggleTag(this)">🙋 Socialización oral</div>
+            <div class="resource-tag" onclick="toggleTag(this)">🚦 Semáforo de aprendizaje</div>
+            <div class="resource-tag" onclick="toggleTag(this)">✋ Pulgar arriba/abajo</div>
+            <div class="resource-tag" onclick="toggleTag(this)">📝 Ticket de salida</div>
+            <div class="resource-tag" onclick="toggleTag(this)">📱 Mentimeter / Padlet</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Tarea o compromiso para la próxima clase (opcional)</label>
+          <input type="text" placeholder="Ej: Investigar qué le pasa a la fotosíntesis cuando hay poca luz o contaminación." oninput="updateProgress()">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── REFLEXIÓN DOCENTE ── -->
+<div class="section-card">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-accent" style="background:#fef9e7; font-size:22px;">🪞</div>
+    <div class="card-title-group">
+      <div class="card-label" style="color:#b7950b">Paso 7</div>
+      <div class="card-title">Reflexión del docente (post-clase)</div>
+      <div class="card-time">Complétala después de dictar la clase</div>
+    </div>
+    <div class="card-toggle">▼</div>
+  </div>
+  <div class="card-body">
+    <div class="card-tip" style="border-color:#f4d03f">
+      <span class="tip-icon">📌</span>
+      <span>Esta sección es para ti. Completarla después de la clase te permitirá mejorar tu práctica y ajustar las próximas planeaciones. Es el insumo más valioso para tu crecimiento profesional.</span>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>¿Se logró el objetivo? ¿En qué porcentaje del grupo?</label>
+        <textarea placeholder="Ej: Aproximadamente el 75% del grupo logró el objetivo. Los estudiantes de los grupos 2 y 5 necesitan refuerzo." style="min-height:80px;" oninput="updateProgress()"></textarea>
+      </div>
+      <div class="field-group">
+        <label>¿Qué funcionó muy bien en esta clase?</label>
+        <textarea placeholder="Ej: El video del minuto 3 al 7 capturó mucho la atención. La actividad en parejas generó buen debate." style="min-height:80px;" oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>¿Qué ajustaría para la próxima vez?</label>
+        <textarea placeholder="Ej: La fase N fue muy larga. Reduciría la explicación a 15 min y daría más tiempo a la aplicación." style="min-height:80px;" oninput="updateProgress()"></textarea>
+      </div>
+      <div class="field-group">
+        <label>Estudiantes que requieren acompañamiento adicional</label>
+        <textarea placeholder="Anota nombres o grupos que necesitan refuerzo o una actividad diferenciada." style="min-height:80px;" oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="summary-card">
+  <div class="summary-title">📋 Resumen de tu planeación</div>
+  <div class="summary-subtitle">Se actualiza automáticamente mientras completas el formulario</div>
+
+  <div class="timeline" id="timeline">
+    <div class="tl-item">
+      <div class="tl-time">0 min</div>
+      <div class="tl-line"><div class="tl-dot" style="background:var(--g1)">G</div><div class="tl-connector" style="background:linear-gradient(var(--g1),var(--a1))"></div></div>
+      <div class="tl-content"><div class="tl-phase" style="color:var(--g1-mid)">G · Goal / Meta — Presentación del Objetivo</div><div class="tl-desc" id="tl-g1">Escribe el objetivo de la clase...</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">5 min</div>
+      <div class="tl-line"><div class="tl-dot" style="background:var(--a1)">A</div><div class="tl-connector" style="background:linear-gradient(var(--a1),var(--n))"></div></div>
+      <div class="tl-content"><div class="tl-phase" style="color:var(--a1-mid)">A · Access Prior Knowledge / Activar conocimientos previos</div><div class="tl-desc" id="tl-a1">Describe cómo activarás conocimientos previos...</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">13 min</div>
+      <div class="tl-line"><div class="tl-dot" style="background:var(--n)">N</div><div class="tl-connector" style="background:linear-gradient(var(--n),var(--a2))"></div></div>
+      <div class="tl-content"><div class="tl-phase" style="color:var(--n-mid)">N · New Information / Nueva información</div><div class="tl-desc" id="tl-n">Describe el nuevo contenido que presentarás...</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">33 min</div>
+      <div class="tl-line"><div class="tl-dot" style="background:var(--a2)">A</div><div class="tl-connector" style="background:linear-gradient(var(--a2),var(--g2))"></div></div>
+      <div class="tl-content"><div class="tl-phase" style="color:var(--a2-mid)">A · Application of New Information / Aplicar el aprendizaje</div><div class="tl-desc" id="tl-a2">Describe la actividad de aplicación...</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">50 min</div>
+      <div class="tl-line"><div class="tl-dot" style="background:var(--g2)">G</div><div class="tl-connector" style="background:none; min-height:0"></div></div>
+      <div class="tl-content"><div class="tl-phase" style="color:var(--g2-mid)">G · Generalize / Generalizar</div><div class="tl-desc" id="tl-g2">Describe cómo cerrarás la clase...</div></div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1);">
+    <div style="font-size:12px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px;">Objetivo SMART de esta clase</div>
+    <div id="objetivo-summary" style="font-size:14px; color:rgba(255,255,255,0.75); line-height:1.7; font-style:italic;">
+      Tu objetivo aparecerá aquí mientras completas el constructor SMART...
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="submitForm()">📤 Enviar planeación</button>
+    <button class="btn btn-outline" onclick="imprimirPlaneacion()">🖨️ Imprimir</button>
+    <button class="btn btn-outline" onclick="clearForm()">🔄 Nueva planeación</button>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- MODAL ENVIANDO -->
+<div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:999; align-items:center; justify-content:center;">
+  <div id="modal-box" style="background:white; border-radius:24px; padding:40px 36px; max-width:420px; width:90%; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.25); animation: popIn 0.3s ease;">
+    <div id="modal-icon" style="font-size:52px; margin-bottom:16px;">📤</div>
+    <div id="modal-title" style="font-family:'DM Serif Display',serif; font-size:1.5rem; color:#1a1a2e; margin-bottom:10px;">Enviando tu planeación...</div>
+    <div id="modal-msg" style="font-size:14px; color:#4a4a6a; line-height:1.6; margin-bottom:24px;">Estamos enviando todos los datos. Por favor espera un momento.</div>
+    <div id="modal-spinner" style="width:36px; height:36px; border:3px solid #e8e4de; border-top-color:#1a1a2e; border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto;"></div>
+    <button id="modal-close-btn" onclick="closeModal()" style="display:none; background:#1a1a2e; color:white; border:none; border-radius:10px; padding:12px 28px; font-size:14px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; margin-top:20px;">✓ Cerrar</button>
+  </div>
+</div>
+
+<style>
+@keyframes popIn { from { transform:scale(0.85); opacity:0; } to { transform:scale(1); opacity:1; } }
+@keyframes spin  { to { transform:rotate(360deg); } }
+</style>
+
+<script>
+// ── TOGGLE CARDS ──
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.card-toggle');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+  updateProgress();
+}
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+// ── TOGGLE TAGS ──
+function toggleTag(el) { el.classList.toggle('active'); }
+function toggleComp(el) { el.classList.toggle('active'); updateProgress(); }
+function toggleEval(el) {
+  document.querySelectorAll('.eval-option').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleBloom(el) {
+  document.querySelectorAll('.bloom-btn').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── TIMER ──
+function setTimer(phase, val, btn) {
+  const container = btn.closest('.timer-selector');
+  container.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const display = document.getElementById(phase + '-time-display');
+  if (display) display.textContent = val;
+}
+
+// ── PREVIEW OBJETIVO SMART ──
+function updatePreview() {
+  const s = document.getElementById('s-field')?.value.trim() || '';
+  const m = document.getElementById('m-field')?.value.trim() || '';
+  const a = document.getElementById('a-field')?.value.trim() || '';
+  const r = document.getElementById('r-field')?.value.trim() || '';
+  const t = document.getElementById('t-field')?.value.trim() || '';
+
+  let parts = [];
+  if (t) parts.push(`<span class="objetivo-highlight">${t}</span>`);
+  else parts.push('Al finalizar la clase');
+  parts.push(', los estudiantes serán capaces de ');
+  if (s) parts.push(`<span class="objetivo-highlight">${s}</span>`);
+  else parts.push('[verbo + contenido específico]');
+  if (m) { parts.push(', '); parts.push(`<span class="objetivo-highlight">${m}</span>`); }
+  if (r) { parts.push(', '); parts.push(`<span class="objetivo-highlight">${r}</span>`); }
+  parts.push('.');
+
+  const preview = document.getElementById('objetivo-preview');
+  const summary = document.getElementById('objetivo-summary');
+  const text = parts.join('');
+  if (preview) preview.innerHTML = text;
+  if (summary) summary.innerHTML = text.replace(/<span[^>]*>/g,'').replace(/<\/span>/g,'');
+}
+
+// ── TIMELINE ──
+function updateTimeline() {
+  const g1 = document.getElementById('g1-gancho')?.value.trim();
+  const a1 = document.getElementById('a1-previos')?.value.trim();
+  const n  = document.getElementById('n-contenido')?.value.trim();
+  const a2 = document.getElementById('a2-actividad')?.value.trim();
+  const g2 = document.getElementById('g2-meta')?.value.trim();
+
+  const truncate = (s, l=90) => s && s.length > l ? s.slice(0,l)+'…' : s;
+  if (g1) document.getElementById('tl-g1').textContent = truncate(g1);
+  if (a1) document.getElementById('tl-a1').textContent = truncate(a1);
+  if (n)  document.getElementById('tl-n').textContent  = truncate(n);
+  if (a2) document.getElementById('tl-a2').textContent = truncate(a2);
+  if (g2) document.getElementById('tl-g2').textContent = truncate(g2);
+}
+
+// ── PROGRESS ──
+function updateProgress() {
+  const fields = document.querySelectorAll('input[type=text], input[type=date], textarea, select');
+  let filled = 0;
+  fields.forEach(f => { if (f.value.trim() !== '') filled++; });
+  const pct = Math.min(100, Math.round((filled / fields.length) * 100));
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('compFill').style.width = pct + '%';
+  document.getElementById('compPct').textContent = pct + '%';
+}
+
+// ── RECOLECTAR DATOS DEL FORMULARIO ──
+function collectData() {
+  // Campos de texto con sus etiquetas legibles
+  const labelMap = {
+    // Datos generales
+    'institucion':    'Institución Educativa',
+    'docente':        'Docente',
+    'area':           'Área / Asignatura',
+    'grado':          'Grado',
+    'fecha':          'Fecha',
+    'dba':            'DBA o EBC asociado',
+    'duracion':       'Duración',
+    'tema':           'Tema de la clase',
+    // SMART
+    's-field':        'SMART — S (Específico)',
+    'm-field':        'SMART — M (Medible)',
+    'a-field':        'SMART — A (Alcanzable)',
+    'r-field':        'SMART — R (Relevante)',
+    't-field':        'SMART — T (Con tiempo)',
+    // GANAG
+    'g1-gancho':      'G1 — Gancho (¿cómo captarás la atención?)',
+    'g1-objetivo':    'G1 — Presentación del objetivo',
+    'a1-previos':     'A1 — Saberes previos esperados',
+    'a1-preguntas':   'A1 — Preguntas detonantes',
+    'n-contenido':    'N — ¿Qué enseñarás y cómo?',
+    'n-pausa':        'N — Pausa de procesamiento',
+    'n-materiales':   'N — Materiales y recursos',
+    'a2-actividad':   'A2 — Actividad de aplicación',
+    'a2-criterio':    'A2 — Criterio mínimo de logro',
+    'a2-retroalim':   'A2 — Retroalimentación durante la actividad',
+    'g2-meta':        'G2 — Pregunta de metacognición',
+    'g2-contexto':    'G2 — Conexión con contexto del estudiante',
+    'g2-tarea':       'G2 — Tarea para próxima clase',
+    // Reflexión
+    'ref-logro':      'Reflexión — ¿Se logró el objetivo?',
+    'ref-funciono':   'Reflexión — ¿Qué funcionó bien?',
+    'ref-ajuste':     'Reflexión — ¿Qué ajustaría?',
+    'ref-refuerzo':   'Reflexión — Estudiantes que requieren acompañamiento',
+  };
+
+  // Asignar ids a los campos que no los tienen
+  const allInputs = document.querySelectorAll('input[type=text], input[type=date], textarea, select');
+  const idList = Object.keys(labelMap);
+  let autoIdx = 0;
+  allInputs.forEach(f => {
+    if (!f.id) {
+      f.id = idList[autoIdx] || ('campo_' + autoIdx);
+      autoIdx++;
+    }
+  });
+
+  const data = {};
+
+  // Campos de texto/textarea/select
+  allInputs.forEach(f => {
+    const label = labelMap[f.id] || f.id;
+    data[label] = f.value.trim() || '(sin completar)';
+  });
+
+  // Tiempos seleccionados por fase
+  ['g1','a1','n','a2','g2'].forEach(phase => {
+    const display = document.getElementById(phase + '-time-display');
+    if (display) {
+      const names = { g1:'Tiempo — G Gancho', a1:'Tiempo — A Activar', n:'Tiempo — N Nueva información', a2:'Tiempo — A Aplicar', g2:'Tiempo — G Generalizar' };
+      data[names[phase]] = display.textContent;
+    }
+  });
+
+  // Tags activos por sección
+  const tagGroups = [
+    { label: 'Recursos G1',           selector: '#res-g1 .resource-tag.active' },
+    { label: 'Estrategia A1',         selector: '#sec-a1 .resource-tag.active' },
+    { label: 'Estrategia N',          selector: '#sec-n .resource-tag.active' },
+    { label: 'Modalidad A2',          selector: '#sec-a2 .resource-tag.active' },
+    { label: 'Cierre G2',             selector: '#sec-g2 .resource-tag.active' },
+    { label: 'Competencias',          selector: '#comp-grid .comp-item.active' },
+    { label: 'Instrumento evaluación',selector: '.eval-option.active' },
+    { label: 'Nivel Bloom',           selector: '.bloom-btn.active' },
+  ];
+  tagGroups.forEach(g => {
+    const els = document.querySelectorAll(g.selector);
+    data[g.label] = els.length ? [...els].map(e => e.textContent.trim()).join(', ') : '(no seleccionado)';
+  });
+
+  // Objetivo SMART armado
+  const objEl = document.getElementById('objetivo-summary');
+  if (objEl) data['Objetivo SMART completo'] = objEl.textContent.trim() || '(sin completar)';
+
+  return data;
+}
+
+// ── MODAL ──
+function openModal(state) {
+  const overlay = document.getElementById('modal-overlay');
+  const icon    = document.getElementById('modal-icon');
+  const title   = document.getElementById('modal-title');
+  const msg     = document.getElementById('modal-msg');
+  const spinner = document.getElementById('modal-spinner');
+  const closeBtn= document.getElementById('modal-close-btn');
+
+  overlay.style.display = 'flex';
+
+  if (state === 'sending') {
+    icon.textContent = '📤';
+    title.textContent = 'Enviando tu planeación...';
+    msg.textContent = 'Estamos enviando todos los datos. Por favor espera un momento.';
+    spinner.style.display = 'block';
+    closeBtn.style.display = 'none';
+  } else if (state === 'success') {
+    icon.textContent = '✅';
+    title.textContent = '¡Planeación enviada!';
+    msg.innerHTML = 'Tu planeación fue enviada exitosamente. <br>El coordinador recibirá un correo con toda la información que diligenciaste.';
+    spinner.style.display = 'none';
+    closeBtn.style.display = 'inline-block';
+    closeBtn.style.background = '#27AE60';
+  } else if (state === 'error') {
+    icon.textContent = '⚠️';
+    title.textContent = 'Hubo un problema al enviar';
+    msg.innerHTML = 'No se pudo enviar la planeación. Verifica tu conexión a internet e intenta nuevamente. Si el problema persiste, usa el botón 🖨️ Imprimir para guardarla.';
+    spinner.style.display = 'none';
+    closeBtn.style.display = 'inline-block';
+    closeBtn.style.background = '#C0392B';
+  } else if (state === 'incomplete') {
+    icon.textContent = '📋';
+    title.textContent = 'Faltan campos importantes';
+    msg.innerHTML = 'Para enviar la planeación completa necesitas llenar al menos: <strong>nombre del docente, área, grado y el objetivo SMART</strong>. Puedes continuar editando o enviar de todas formas.';
+    spinner.style.display = 'none';
+    closeBtn.style.display = 'none';
+  }
+}
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+// ── VALIDAR CAMPOS MÍNIMOS ──
+function validateMinimum() {
+  const docente = document.querySelector('input[placeholder*="nombre completo"]')?.value.trim();
+  const area    = document.getElementById('area')?.value.trim();
+  const grado   = document.querySelector('select')?.value;
+  const smart_s = document.getElementById('s-field')?.value.trim();
+  return !!(docente && area && grado && smart_s);
+}
+
+// ── ENVÍO A FORMSPREE ──
+async function submitForm() {
+  if (!validateMinimum()) {
+    openModal('incomplete');
+    // Botones de la modal de incompleto
+    const box = document.getElementById('modal-box');
+    // Quitar botones previos si existen
+    const old = document.getElementById('incomplete-actions');
+    if (old) old.remove();
+    const div = document.createElement('div');
+    div.id = 'incomplete-actions';
+    div.style.cssText = 'display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap;';
+    div.innerHTML = `
+      <button onclick="closeModal()" style="background:#e8e4de; color:#1a1a2e; border:none; border-radius:10px; padding:10px 20px; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer;">✏️ Seguir editando</button>
+      <button onclick="closeModal(); doSend();" style="background:#1a1a2e; color:white; border:none; border-radius:10px; padding:10px 20px; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer;">📤 Enviar de todas formas</button>
+    `;
+    box.appendChild(div);
+    return;
+  }
+  doSend();
+}
+
+function imprimirPlaneacion() {
+  // Abrir todas las secciones antes de imprimir
+  document.querySelectorAll('.card-body').forEach(b => b.classList.add('open'));
+  document.querySelectorAll('.card-toggle').forEach(t => t.classList.add('open'));
+  setTimeout(() => { window.print(); }, 300);
+}
+
+async function doSend() {
+  openModal('sending');
+  const data = collectData();
+
+  // Armar cuerpo del mensaje legible
+  let body = '═══════════════════════════════\n';
+  body += '   PLANEACIÓN DE CLASE — GANAG\n';
+  body += '═══════════════════════════════\n\n';
+
+  const sections = [
+    { title: '📄 DATOS GENERALES', keys: ['Institución Educativa','Docente','Área / Asignatura','Grado','Fecha','Duración','Tema de la clase','DBA o EBC asociado'] },
+    { title: '🎯 OBJETIVO SMART', keys: ['SMART — S (Específico)','SMART — M (Medible)','SMART — A (Alcanzable)','SMART — R (Relevante)','SMART — T (Con tiempo)','Objetivo SMART completo','Competencias'] },
+    { title: '🎣 G1 — GANCHO', keys: ['Tiempo — G Gancho','G1 — Gancho (¿cómo captarás la atención?)','G1 — Presentación del objetivo','Recursos G1'] },
+    { title: '🧠 A1 — ACTIVAR SABERES PREVIOS', keys: ['Tiempo — A Activar','A1 — Saberes previos esperados','Estrategia A1','A1 — Preguntas detonantes'] },
+    { title: '📚 N — NUEVA INFORMACIÓN (El cerebro de la clase)', keys: ['Tiempo — N Nueva información','Nivel Bloom','N — ¿Qué enseñarás y cómo?','Estrategia N','N — Pausa de procesamiento','N — Materiales y recursos'] },
+    { title: '⚙️ A2 — APLICAR (El corazón de la clase)', keys: ['Tiempo — A Aplicar','A2 — Actividad de aplicación','Modalidad A2','Instrumento evaluación','A2 — Criterio mínimo de logro','A2 — Retroalimentación durante la actividad'] },
+    { title: '🌐 G2 — GENERALIZAR', keys: ['Tiempo — G Generalizar','G2 — Pregunta de metacognición','G2 — Conexión con contexto del estudiante','Cierre G2','G2 — Tarea para próxima clase'] },
+    { title: '🪞 REFLEXIÓN POST-CLASE', keys: ['Reflexión — ¿Se logró el objetivo?','Reflexión — ¿Qué funcionó bien?','Reflexión — ¿Qué ajustaría?','Reflexión — Estudiantes que requieren acompañamiento'] },
+  ];
+
+  sections.forEach(sec => {
+    body += `\n${sec.title}\n${'─'.repeat(40)}\n`;
+    sec.keys.forEach(k => {
+      if (data[k] && data[k] !== '(sin completar)') {
+        body += `• ${k}:\n  ${data[k]}\n\n`;
+      }
+    });
+  });
+
+  const formData = new FormData();
+  formData.append('_subject', `📋 Planeación GANAG — ${data['Docente'] || 'Docente'} | ${data['Área / Asignatura'] || 'Área'} | ${data['Grado'] || ''}`);
+  formData.append('Planeación completa', body);
+  formData.append('Docente', data['Docente'] || '');
+  formData.append('Institución', data['Institución Educativa'] || '');
+  formData.append('Área', data['Área / Asignatura'] || '');
+  formData.append('Grado', data['Grado'] || '');
+  formData.append('Fecha', data['Fecha'] || '');
+  formData.append('Tema', data['Tema de la clase'] || '');
+  formData.append('Objetivo SMART', data['Objetivo SMART completo'] || '');
+
+  try {
+    const res = await fetch('https://formspree.io/f/mykngqnv', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      openModal('success');
+    } else {
+      openModal('error');
+    }
+  } catch(e) {
+    openModal('error');
+  }
+}
+
+function clearForm() {
+  if (confirm('¿Estás seguro de que quieres borrar toda la planeación?')) {
+    document.querySelectorAll('input, textarea').forEach(f => f.value = '');
+    document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    document.querySelectorAll('.active').forEach(el => { if (!el.classList.contains('card-toggle')) el.classList.remove('active'); });
+    updateProgress(); updatePreview(); updateTimeline();
+  }
+}
+
+// Focus colors
+document.querySelectorAll('.field-group input, .field-group textarea, .field-group select').forEach(el => {
+  const card = el.closest('.section-card');
+  const label = card?.querySelector('.card-label');
+  if (label) {
+    const color = getComputedStyle(label).color;
+    el.addEventListener('focus', () => { el.style.borderColor = color; });
+    el.addEventListener('blur',  () => { el.style.borderColor = ''; });
+  }
+});
+
+// init
+updateProgress();
+</script>
+</body>
+</html>
